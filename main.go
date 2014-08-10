@@ -1,12 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/render"
 )
+
+func indexHandler(rnd render.Render) {
+	rnd.HTML(200,"index",nil)
+}
 
 func main() {
 	m := martini.Classic()
-	fmt.Println("Hello World!")
+	m.Use(render.Renderer(render.Options{
+		Directory:  "templates",                         // Specify what path to load the templates from.
+		Layout:     "layout",                            // Specify a layout template. Layouts can call {{ yield }} to render the current template.
+		Extensions: []string{".tmpl", ".html"},          // Specify extensions to load for templates.
+		//Funcs:      []template.FuncMap{unescapeFuncMap}, // Specify helper function maps for templates to access.
+		Charset:    "UTF-8",                             // Sets encoding for json and html content-types. Default is "UTF-8".
+		IndentJSON: true,                                // Output human readable JSON
+	}))
+
+	staticOptions := martini.StaticOptions{ Prefix : "assets"}
+	m.Use(martini.Static("assets", staticOptions))
+
+	m.Get("/",indexHandler)
 	m.Run()
 }
+
+
