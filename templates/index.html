@@ -1,24 +1,14 @@
 
-<div>
-
-    <div>
-        <div class="row">
-            <div class="col-xs-2">
-            </div>
-            <div class="col-xs-8">
-                <h1>Title(Страничка со всеми проектами)</h1>
-            </div>
-            <div class="col-xs-2">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-2">
-            </div>
-            <div class="col-xs-8">
-             Content
-            </div>
-            <div class="col-xs-2">
-            </div>
-        </div>
+<form role="form" method="POST" action="/login">
+    <div class="form-group">
+        <label>Login</label>
+        <input type="text" class="form-control" id="login" name="login" value=""  />
     </div>
-</div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="text" class="form-control" id="password" name="password" value=""  />
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+
+<a href="/registration"><h1>Регистрация</h1></a>
