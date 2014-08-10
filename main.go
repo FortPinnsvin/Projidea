@@ -4,8 +4,8 @@ import (
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"net/http"
+	"labix.org/v2/mgo"
 )
-
 func checkPassword(login, password string) bool {
 	if login == "azaru" && password == "123"{
 		return true
@@ -14,11 +14,10 @@ func checkPassword(login, password string) bool {
 }
 
 func indexHandler(rnd render.Render) {
-	rnd.HTML(200,"index",nil)
+	rnd.HTML(200,"login",nil)
 }
 
 func mainHandler(rnd render.Render, r *http.Request ) {
-
 	rnd.HTML(200,"main",nil)
 }
 
@@ -37,7 +36,19 @@ func error_LoginHandler(rnd render.Render) {
 	rnd.HTML(200,"error","Didn't find user")
 }
 
+
+
+var usersCollection *mgo.Collection
+
 func main() {
+
+	session, err := mgo.Dial("localhost")
+	if err != nil{
+		panic(err)
+	}
+
+	usersCollection = session.DB("projidea").C("users")
+
 	m := martini.Classic()
 	m.Use(render.Renderer(render.Options{
 		Directory:  "templates",                         // Specify what path to load the templates from.
