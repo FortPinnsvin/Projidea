@@ -5,11 +5,27 @@ import (
 	"github.com/martini-contrib/render"
 	"net/http"
 	"labix.org/v2/mgo"
+	"crypto/rand"
+	"fmt"
+	"Projidea/models"
+	
 )
-func checkPassword(login, password string) bool {
-	if login == "azaru" && password == "123"{
-		return true
+
+func generateId() string{
+	b := make([]byte, 16)
+	rand.Read(b)
+	return fmt.Sprintf("%x",b)
+}
+
+func checkPassword(r *http.Request, login, password string) bool {
+	users := []models.UserDocument{}
+	usersCollection.Find(nil).All(&users)
+    for _,user := range users{
+		if user.Name == login && user.Password == password{
+			return true
+		}
 	}
+
 	return false
 }
 
@@ -18,13 +34,13 @@ func indexHandler(rnd render.Render) {
 }
 
 func mainHandler(rnd render.Render, r *http.Request ) {
-	rnd.HTML(200,"main",nil)
+	rnd.HTML(200, "main", nil)
 }
 
 func loginHandler(rnd render.Render, r *http.Request ) {
 	login := r.FormValue("login")
 	pass := r.FormValue("password")
-	if checkPassword(login,pass){
+	if checkPassword(nil,login,pass){
 		rnd.Redirect("/main")
 	}else{
 		rnd.Redirect("/error_Login")
@@ -34,6 +50,20 @@ func loginHandler(rnd render.Render, r *http.Request ) {
 
 func error_LoginHandler(rnd render.Render) {
 	rnd.HTML(200,"error","Didn't find user")
+}
+
+func regestrationHandler(rnd render.Render, r *http.Request ) {
+	id := generateId()
+	name := r.FormValue("login_reg")
+	password := r.FormValue("password_reg")
+	password_2 := r.FormValue("password_reg_2")
+	if password == password_2 {
+		usersCollection.Insert(&models.UserDocument{id, name, password})
+	}else{
+		rnd.HTML(200,"login","Passwords don't coincide!!!")
+	}
+	rnd.Redirect("/main")
+
 }
 
 
@@ -66,8 +96,11 @@ func main() {
 	m.Get("/main",mainHandler)
 	m.Post("/login",loginHandler)
 	m.Get("/error_Login",error_LoginHandler)
+	m.Post("/regestration", regestrationHandler)
 	m.Run()
 }
+
+
 
 
 
